@@ -1,31 +1,38 @@
-import React from "react";
+import React, { memo } from "react";
+import withLog from "./withLog";
 
 class Display extends React.Component {
     render() {
         return(
-            <div>
-                <textarea 
-                    className="calc-display"
-                    cols={30}
-                    rows={3}
-                    value={this.props.value}
-                    readOnly
-                ></textarea>
-            </div>
+            <p
+                id="display"
+                // passing tabIndex -1 to make text-area non-focusable
+                // by keyboard
+                tabIndex={-1}
+            >{this.props.value}</p>
         )
     }
 }
 
-class Button extends React.Component {
-    render() {
-        return (
-            <button 
-                onClick={this.props.onClick}
-                value={this.props.value}
-            >{this.props.value}</button>
-        )
-    }
-}
+const Button = memo(function Button(props) {
+    return (
+        <button 
+            onClick={props.onClick}
+            value={props.value}
+        >{props.value}</button>
+    )
+})
+
+// const Button = (props) => (
+//     <button
+//         onClick={props.onClick}
+//         value={props.value}
+//     >
+//     {props.value}
+//     </button>
+// )
+
+const ButtonWithLog = withLog(Button)
 
 class KeyRow extends React.Component {
     render() {
@@ -51,17 +58,7 @@ class NumberGrid extends React.Component {
 class ArithmeticColumn extends React.Component {
     render() {
         return (
-            <div>
-                {this.props.children}
-            </div>
-        )
-    }
-}
-
-class BottomKeysRow extends React.Component {
-    render() {
-        return (
-            <div>
+            <div className="column">
                 {this.props.children}
             </div>
         )
@@ -71,11 +68,11 @@ class BottomKeysRow extends React.Component {
 class Keypad extends React.Component {
     render() {
         return (
-            <div className="flex">
+            <div className="flex" id="keypad">
                 <NumberGrid>
                     {/* Button inside KeyRow is an attempt at Containment */}
                     <KeyRow>
-                        <Button onClick={this.props.onClick} value="1" />
+                        <ButtonWithLog onClick={this.props.onClick} value="1" />
                         <Button onClick={this.props.onClick} value="2" />
                         <Button onClick={this.props.onClick} value="3" />
                     </KeyRow>
@@ -89,16 +86,17 @@ class Keypad extends React.Component {
                         <Button onClick={this.props.onClick} value="8" />
                         <Button onClick={this.props.onClick} value="9" />
                     </KeyRow>
+                    <KeyRow>
+                        <Button onClick={this.props.onClick} value="0" />
+                        <Button value="C" onClick={this.props.onClearScreen} />
+                        <Button value="=" onClick={this.props.onCalculateResult} />
+                    </KeyRow>
                 </NumberGrid>
-                <BottomKeysRow>
-                    <Button onClick={this.props.onClick} value="0" />
-                    <Button value="C" />
-                </BottomKeysRow>
                 <ArithmeticColumn>
-                    <Button value="+" />
-                    <Button value="-" />
-                    <Button value="*" />
-                    <Button value="÷" />
+                    <Button value="+" onClick={this.props.onOperationClick} />
+                    <Button value="-" onClick={this.props.onOperationClick} />
+                    <Button value="*" onClick={this.props.onOperationClick} />
+                    <Button value="÷" onClick={this.props.onOperationClick} />
                 </ArithmeticColumn>
             </div>
         )
